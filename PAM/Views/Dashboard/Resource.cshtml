@@ -1,0 +1,16 @@
+@model PAM.Domain.Models.TargetResource
+
+@{
+    Layout = "_DashboardLayout";
+    ViewData["Title"] = Model.Name;
+}
+
+<h2 style="margin-bottom: 0 !important;">@Model.Name</h2>
+<p class="text-muted" style="margin-top: 0 !important;">ID: @Model.Id</p>
+
+<div class="mt-5" data-role="panel">
+    <button class="button success"
+            onclick="window.open('/sessions/terminal/@Model.Id', '', 'width=550,height=400');">
+        Подключиться по SSH
+    </button>
+</div>

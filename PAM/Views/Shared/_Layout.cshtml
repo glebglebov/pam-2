@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="color-scheme" content="dark">
+    
+    <title>PAM > @ViewData["Title"]</title>
+    
+    <link rel="stylesheet" href="https://cdn.korzh.com/metroui/v4.5.1/css/metro-all.min.css">
+
+    <style>
+        .bi {
+            position: absolute;
+            fill: currentColor;
+            left: 25px;
+            margin-top: -7px;
+            font-size: 24px;
+            top: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div data-role="appbar">
+        <a href="#" class="brand">PAM > @ViewData["Title"]</a>
+    </div>
+    <div class="container w-75" style="padding-top: 100px;">
+        @RenderBody()
+        <script src="https://cdn.korzh.com/metroui/v4.5.1/js/metro.min.js"></script>
+    </div>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<div class="dialog" data-role="dialog" id="createRes">
+    <div class="dialog-title">Добавить ресурс</div>
+    <div class="dialog-content">
+        <form asp-controller="Dashboard" asp-action="CreateResource">
+            <div class="form-group">
+                <label for="inputName">Название ресурса</label>
+                <input type="text" class="metro-input" name="name" id="inputName">
+            </div>
+            <div class="form-group">
+                <label for="inputAddress">Адрес ресурса</label>
+                <input type="text" class="metro-input" name="address" id="inputAddress">
+            </div>
+            <div class="form-group">
+                <button type="submit" class="button success">Добавить</button>
+            </div>
+        </form>
+    </div>
+    <div class="dialog-actions">
+        <button class="button js-dialog-close">Закрыть окно</button>
+    </div>
+</div>
+
+<button class="button primary" onclick="Metro.dialog.open('#createRes')">Добавить ресурс</button>
+

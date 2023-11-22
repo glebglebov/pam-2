@@ -1,0 +1,88 @@
+@model UserPageModel
+
+@{
+    Layout = "_DashboardLayout";
+    var user = Model.User;
+    var ch = user.Is2FaEnabled ? "checked" : "";
+    ViewData["Title"] = user.Login;
+}
+
+<h2 style="margin-bottom: 0 !important;">@user.Login</h2>
+<p class="text-muted" style="margin-top: 0 !important;">ID: @user.Id</p>
+
+<ul data-role="tabs" data-expand="true" class="tabs-list" style="margin-top: 1rem !important;">
+    <li><a href="#_target_1">Обзор</a></li>
+    <li><a href="#_target_2">Доступы</a></li>
+    <li><a href="#_target_3">2FA</a></li>
+</ul>
+<div class="border bd-default no-border-top p-2">
+    <div id="_target_1">
+        ...
+    </div>
+    <div id="_target_2">
+        <form class="inline-form" asp-controller="Dashboard" asp-action="AddUserPermission">
+            <input type="hidden" name="userId" value="@user.Id"/>
+            <select data-role="select" name="resourceId">
+                <option selected>Открыть список</option>
+                @foreach (var resource in Model.AvailableResources)
+                {
+                    <option value="@resource.Id">@resource.Name</option>
+                }
+            </select>
+            <button type="submit" class="button success">Выдать доступ</button>
+        </form>
+
+        @if (Model.ResourcePermissions.Length < 1)
+        {
+            <p class="text-muted text-center">У пользователя нет выданных доступов</p>
+        }
+        else
+        {
+            <form asp-action="RevokeUserPermission" class="mt-10">
+                <input type="hidden" name="userId" value="@user.Id" />
+                <ul class="group-list">
+                    @foreach (var resource in Model.ResourcePermissions)
+                    {
+                        <li>
+                            <div class="d-flex flex-justify-between flex-align-center">
+                                <div>
+                                    @resource.Name
+                                    <span class="badge inline bg-cyan fg-white">@resource.Address</span>
+                                </div>
+                                <div>
+                                    <button type="submit" class="button alert" name="resourceId" value="@resource.Id">
+                                        Отозвать доступ
+                                    </button>
+                                </div>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </form>
+        }
+    </div>
+    <div id="_target_3">
+        <form asp-action="Set2Fa">
+            <input type="hidden" name="userId" value="@user.Id"/>
+            <div>
+                <input
+                    name="isEnabled"
+                    type="checkbox"
+                    data-role="switch"
+                    data-caption="Использовать 2FA"
+                    data-caption-position="left"
+                    @ch>
+            </div>
+            <div>
+                <button type="submit" class="button alert">Сохранить</button>
+            </div>
+        </form>
+        <div style="text-align: center;">
+            <p class="text-muted text-center">QR-код для приложения TOTP</p>
+            <img
+                style="width: 250px; height: 250px;"
+                src="data:image/png;base64,@Model.Base64QrCode"
+                alt="TOTP QR code" />
+        </div>
+    </div>
+</div>

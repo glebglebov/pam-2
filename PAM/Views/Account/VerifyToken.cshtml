@@ -1,0 +1,15 @@
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "2FA";
+}
+
+<div class="container" style="width: 30%;">
+    <form class="mb-2" asp-action="VerifyToken">
+        <div class="form-group">
+            <input class="metro-input" type="text" name="token" placeholder="Одноразовый пароль..." />
+        </div>
+        <div class="form-group">
+            <button type="submit" class="button success">Отправить</button>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,41 @@
+@using PAM.Domain.Models
+@model LogsPageModel
+
+@{
+    Layout = "_MonitoringLayout";
+    ViewData["Title"] = "Журнал";
+    ViewData["Name"] = "logs";
+
+    string GetClass(LogLevel level)
+        => level switch
+        {
+            LogLevel.Info => "secondary",
+            LogLevel.Warning => "yellow",
+            LogLevel.Critical => "alert",
+            _ => ""
+        };
+}
+
+<nav class="mt-5">
+    <ul class="pagination justify-content-end">
+        @for (var i = 0; i < Model.PageCount; i++)
+        {
+            var pageNumber = i + 1;
+            <li class="page-item @(pageNumber == Model.CurrentPage ? "active" : "")">
+                <a class="page-link"
+                   asp-action="GetLogsPage"
+                   asp-route-page="@pageNumber">
+                    @pageNumber
+                </a>
+            </li>
+        }
+    </ul>
+</nav>
+
+@foreach (var log in Model.Logs)
+{
+    <div class="remark @GetClass(log.Level)" role="alert">
+        <p class="text-muted">@log.Timestamp</p>
+        <p class="mt-2">@log.Title</p>
+    </div>
+}

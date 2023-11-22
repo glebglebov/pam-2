@@ -1,0 +1,205 @@
+@model SessionPageModel
+
+@{
+    Layout = null;
+    var id = Model.ResourceId.ToString();
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Терминал</title>
+    <style>
+        * {
+            font-family: monospace;
+            box-sizing: border-box;
+            font-weight: bold;
+        }
+        
+        body {
+            color: white;
+            margin: 0;
+            background: black;
+            font-size: 0.8em;
+        }
+        
+        input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: white;
+            font-size: 1em;
+        }
+        
+        #sendMessage {
+            width: 60%;
+        }
+        
+        p {
+            margin-top: 2px;
+            margin-bottom: 2px;
+            white-space: pre-wrap;
+        }
+        
+        .main_wrapper {
+            margin: 0 auto;
+            min-width: 100%;
+            max-width: 100%;
+            min-height: 100%;
+            max-height: 100%;
+            padding-bottom: 50px;
+        }
+        
+        .control {
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px;
+            background: black;
+        }
+        
+        .status {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            padding: 2px 20px;
+            background: white;
+            color: black;
+            font-size: 0.7em;
+        }
+        
+        .error {
+            color: darkred;
+        }
+    </style>
+</head>
+<body>
+<div class="main_wrapper">
+    <div id="commsLog" class="logs">
+    </div>
+    <div class="control">
+        <div>
+            <label for="sendMessage">>>></label>
+            <input id="sendMessage" autofocus="autofocus" disabled />
+            <button id="sendButton" type="submit" disabled>Отправить</button>
+            <button id="closeButton" disabled>Отключиться</button>
+        </div>
+    </div>
+    <div class="status">
+        <p id="stateLabel">Ready to connect...</p>
+    </div>
+</div>
+
+<script>
+    var stateLabel = document.getElementById("stateLabel");
+    var sendMessage = document.getElementById("sendMessage");
+    var sendButton = document.getElementById("sendButton");
+    var commsLog = document.getElementById("commsLog");
+    var closeButton = document.getElementById("closeButton");
+    
+    var resId = "@id";
+    var port = document.location.port ? (":" + document.location.port) : "";
+    var connectionUrl = "ws://" + document.location.hostname + port + "/sessions/ws?resId=" + resId;
+    
+    var socket;
+        
+    window.addEventListener("load", () => {
+        stateLabel.innerHTML = "Connecting";
+        socket = new WebSocket(connectionUrl);
+        
+        socket.onopen = function () {
+            updateState();
+        };
+        
+        socket.onclose = function (event) {
+          updateState();
+          commsLog.innerHTML += '<p class="error">Connection closed. Code: ' + htmlEscape(event.code) + ', reason: ' + htmlEscape(event.reason)+ '</p>';
+        };
+        
+        socket.onerror = updateState;
+        socket.onmessage = function (event) {
+          commsLog.innerHTML += '<p>' + htmlEscape(event.data) + '</p>';
+          window.scrollTo(0, document.body.scrollHeight);
+      };
+    });
+    
+    sendMessage.addEventListener("keypress", function(event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        sendButton.click();
+        sendMessage.value = "";
+      }
+    });
+    
+    function updateState() {
+        function disable() {
+            sendMessage.disabled = true;
+            sendButton.disabled = true;
+            closeButton.disabled = true;
+        }
+        function enable() {
+            sendMessage.disabled = false;
+            sendButton.disabled = false;
+            closeButton.disabled = false;
+        }
+    
+        if (!socket) {
+            disable();
+        } else {
+            switch (socket.readyState) {
+                case WebSocket.CLOSED:
+                    stateLabel.innerHTML = "Closed";
+                    disable();
+                    break;
+                case WebSocket.CLOSING:
+                    stateLabel.innerHTML = "Closing...";
+                    disable();
+                    break;
+                case WebSocket.CONNECTING:
+                    stateLabel.innerHTML = "Connecting...";
+                    disable();
+                    break;
+                case WebSocket.OPEN:
+                    stateLabel.innerHTML = "Open";
+                    enable();
+                    break;
+                default:
+                    stateLabel.innerHTML = "Unknown WebSocket State: " + htmlEscape(socket.readyState);
+                    disable();
+                    break;
+            }
+        }
+    }
+    
+    closeButton.onclick = function () {
+        if (!socket || socket.readyState !== WebSocket.OPEN) {
+            alert("socket not connected");
+        }
+        socket.close(1000, "Closing from client");
+    };
+    
+    sendButton.onclick = function () {
+        if (!socket || socket.readyState !== WebSocket.OPEN) {
+            alert("socket not connected");
+        }
+        
+        var data = sendMessage.value;
+        if (data.length < 1)
+            return;
+        
+        socket.send(data);
+    };
+    
+    function htmlEscape(str) {
+        return str.toString()
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+}
+</script>
+</body>
+</html>

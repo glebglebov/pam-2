@@ -1,0 +1,18 @@
+@{
+    Layout = "_DashboardLayout";
+    ViewData["Title"] = "Начало";
+
+    string GetClass(string name)
+        => (string)ViewData["Name"]! == name ? "active" : "";
+}
+
+<ul data-role="tabs" data-expand="true">
+    <li class="@GetClass("logs")">
+        <a asp-controller="Monitoring" asp-action="GetAllLogs">Журнал</a>
+    </li>
+    <li class="@GetClass("sessions")">
+        <a asp-controller="Monitoring" asp-action="GetSessions">Сессии</a>
+    </li>
+</ul>
+
+@RenderBody()

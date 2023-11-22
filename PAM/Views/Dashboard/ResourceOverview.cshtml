@@ -1,0 +1,42 @@
+@model ResourceOverviewPageModel
+
+@{
+    Layout = "_DashboardLayout";
+    ViewData["Title"] = "Ресурсы";
+}
+
+@if (Model.CanCreateNew)
+{
+    <partial name="_CreateResource" />
+}
+
+<table class="table"
+       data-role="table"
+       data-show-search="false"
+       data-show-pagination="false"
+       data-show-rows-steps="false"
+       data-show-table-info="false"
+       data-table-rows-count-title="Показывать по:"
+       data-table-info-title="Показано с $1 по $2 из $3"
+       data-pagination-prev-title="Назад"
+       data-pagination-next-title="Вперёд">
+    <thead>
+    <tr>
+        <th data-sortable="true" data-sort-dir="asc">Название</th>
+        <th data-sortable="false">Хост</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var resource in Model.Resources)
+    {
+        <tr>
+            <td>
+                <a asp-action="Resource" asp-route-resourceId="@resource.Id">@resource.Name</a>
+            </td>
+            <td>
+                @resource.Address
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

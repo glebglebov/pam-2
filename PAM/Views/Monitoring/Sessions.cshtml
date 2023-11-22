@@ -1,0 +1,24 @@
+@using PAM.Domain.Models
+@model SessionsPageModel
+
+@{
+    Layout = "_MonitoringLayout";
+    ViewData["Title"] = "Сессии";
+    ViewData["Name"] = "sessions";
+
+    (string, string) GetBadge(Session session)
+        => session.EndTimestamp == null
+            ? ("В процессе", "badge inline bg-blue fg-white")
+            : ("Завершена", "badge inline bg-green fg-white");
+}
+
+@foreach (var session in Model.Sessions)
+{
+    var (text, cl) = GetBadge(session);
+    <div class="mt-4" data-role="panel">
+        <p class="text-muted">@session.Guid <span class="@cl">@text</span></p>
+        <p>Ресурс: @session.ResourceName</p>
+        <p>ID пользователя: @session.UserId</p>
+        <p>IP пользователя: @session.UserIp</p>
+    </div>
+}
